@@ -188,8 +188,41 @@ int main(int argc, char **argv)
 			if (*p != '\0' || id > ULONG_MAX || id <= 0)
 				puts("Error de parametro id");
 			else
+			{
 				printf("Borrando la nota n° %lu.\n", id);
-			return 1;
+				FILE *archivoPtr;
+				char buffer[255] = {};
+				archivoPtr = fopen("notas", "r+");
+				while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
+				{
+					/* PARECE QUE HABRIA QUE COPIAR TODO Y LUEGO HACER UN ARCHIVO NUEVO SIN LA LINEA DROPEAR*/
+					// VER QUE HACE FSEEK
+					// VER QUE HACE FTELL
+					int totalBuffer = strlen(buffer);
+					char *linea = (char *)malloc(totalBuffer);
+					memcpy(linea, buffer, totalBuffer);
+					char *campoId = strtok(buffer, " | ");
+					if (atoi(campoId) == id)
+					{
+						//fputs(buffer, archivoPtr);
+						//printf("\n\e[0;36m%s\n\n", linea);
+						printf("\n--->%lu\n",ftell(archivoPtr));
+						// ftell me da el marcador del file.
+						// en este caso es el final de la linea coincidente
+						fseek(archivoPtr,-ftell(archivoPtr),SEEK_CUR); // ojo. Esto me lleva al comienzo del archivo !!!!!!
+						// como 2do parametro deberia ir el LEN(de la linea acutal a borrar)
+						// entonces debo volver al inicio de esa linea.NO, con ese fseek me voy a la posicion 0
+						// ver el segundo parametro de fseek que es negativo (bytes para atras)
+						// SEEK_CUR es desde la currente posicion que me la da ftell.
+
+						// ahora deberia imprimir un vacio en esa posicion.
+						printf("\n--->%lu\n",ftell(archivoPtr));
+						free(linea);
+						fclose(archivoPtr);
+						return 1;
+					}
+				}
+			}
 		}
 	};
 
