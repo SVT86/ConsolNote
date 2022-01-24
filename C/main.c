@@ -86,6 +86,65 @@ int escribir(const char *argumento)
 	return 1;
 }
 
+/* LECTURA*********************************************************************************/
+int lectura(char *arg2)
+{
+	if (arg2)
+	{
+		if (*arg2 == 'a')
+		{
+			FILE *archivoPtr;
+			archivoPtr = fopen("notas", "r");
+			char buffer[] = {};
+			while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
+				printf("\e[0;36m%s\n", buffer);
+			fclose(archivoPtr);
+			return 1;
+		}
+
+		if (*arg2 && *arg2 != 'a')
+		{
+
+			char buffer[255] = {};
+			char *p;
+
+			long id = strtol(arg2, &p, 10); // ver el puntero *p !!!!!!
+			if (*p != '\0' || id > ULONG_MAX || id <= 0)
+			{
+				puts("Error de parametro id!!!");
+				return 1;
+			}
+			else
+			{
+				FILE *archivoPtr;
+				archivoPtr = fopen("notas", "r");
+				while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
+				{
+					int totalBuffer = strlen(buffer);
+					char *linea = (char *)malloc(totalBuffer);
+					memcpy(linea, buffer, totalBuffer);
+					char *campoId = strtok(buffer, " | ");
+					if (atoi(campoId) == atoi(arg2))
+					{
+
+						printf("\n\e[0;36m%s\n\n", linea);
+						free(linea);
+						fclose(archivoPtr);
+						return 1;
+					}
+				}
+
+				printf("\e[0;31m id \e[4m%lu\e[0;31m not found.\e[0m\n", id);
+				return 0;
+			}
+
+			return 1;
+		}
+	}
+	puts("Especifique opción de lectura.");
+	return 0;
+}
+
 /* MAIN ***********************************************************************************/
 int main(int argc, char **argv)
 {
@@ -118,62 +177,7 @@ int main(int argc, char **argv)
 
 		/* Leer */
 		if (*argv[1] == 'r')
-		{
-			if (argv[2])
-			{
-				if (*argv[2] == 'a')
-				{
-					FILE *archivoPtr;
-					archivoPtr = fopen("notas", "r");
-					char buffer[] = {};
-					while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
-						printf("\e[0;36m%s\n", buffer);
-					fclose(archivoPtr);
-					return 1;
-				}
-
-				if (*argv[2] && *argv[2] != 'a')
-				{
-
-					char buffer[255] = {};
-					char *p;
-
-					long id = strtol(argv[2], &p, 10); // ver el puntero *p !!!!!!
-					if (*p != '\0' || id > ULONG_MAX || id <= 0)
-					{
-						puts("Error de parametro id!!!");
-						return 1;
-					}
-					else
-					{
-						FILE *archivoPtr;
-						archivoPtr = fopen("notas", "r");
-						while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
-						{
-							int totalBuffer = strlen(buffer);
-							char *linea = (char *)malloc(totalBuffer);
-							memcpy(linea, buffer, totalBuffer);
-							char *campoId = strtok(buffer, " | ");
-							if (atoi(campoId) == atoi(argv[2]))
-							{
-
-								printf("\n\e[0;36m%s\n\n", linea);
-								free(linea);
-								fclose(archivoPtr);
-								return 1;
-							}
-						}
-
-						printf("\e[0;31m id \e[4m%lu\e[0;31m not found.\e[0m\n", id);
-						return 0;
-					}
-
-					return 1;
-				}
-			}
-			puts("Especifique opción de lectura.");
-			return 0;
-		}
+			return lectura(argv[2]);
 
 		/* Borrar */
 		if (*argv[1] == 'd' && argv[2])
