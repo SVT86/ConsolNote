@@ -211,13 +211,16 @@ int main(int argc, char **argv)
 						{
 
 							printf("Borrando la nota n° %lu.\n", id);
+							// me posiciono cuando comienza la fecha.
 							fseek(archivoPtr, -totalBuffer + 6, SEEK_CUR);
 
+							// ahora 0 seria comienzo de fecha.
+							// tengo que terminar 7 antes, sino me paso del final de la linea
 							for (int x = 0; x < totalBuffer - 7; x++)
-								fputc('\0', archivoPtr);
-							fputc('\n', archivoPtr);
+								fputc('\0', archivoPtr); // coloco tantos char vacios
+							fputc('\n', archivoPtr); // y al final \n para que pueda contar despues.
 
-							fseek(archivoPtr, 1, SEEK_CUR);
+							fseek(archivoPtr, 1, SEEK_CUR); // me adelanto 1 mas y caigo a la sig. linea.
 
 							free(linea);
 							fclose(archivoPtr);
