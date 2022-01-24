@@ -46,7 +46,7 @@ int escribir(const char *argumento)
 	//printf("\n| \e[1;36m%i\e[m | \e[1;31m%s\e[m | \e[0;34m %s \e[m |\n\n", entrada.id, entrada.date, entrada.contenido);
 
 	// averiguar cuantas lineas para el proximo id.
-	archivoPtr = fopen("notas", "a+");
+	archivoPtr = fopen(".notas", "a+");
 	long int contador = 1;
 	if (archivoPtr)
 	{
@@ -94,7 +94,11 @@ int lectura(char *arg2)
 		if (*arg2 == 'a')
 		{
 			FILE *archivoPtr;
-			archivoPtr = fopen("notas", "r");
+			if (!(archivoPtr = fopen(".notas", "r")))
+			{
+				puts("\nBlock de notas no encontrado.\n");
+				return 0;
+			}
 			char buffer[] = {};
 			while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
 				printf("\e[0;36m%s\n", buffer);
@@ -145,6 +149,66 @@ int lectura(char *arg2)
 	return 0;
 }
 
+int borrar(char *argumento)
+{
+
+	char *p;
+	long id = strtol(argumento, &p, 10); // ver el puntero *p !!!!!!
+
+	if (*p != '\0' || id > ULONG_MAX || id <= 0)
+		puts("Error de parametro id");
+	else
+	{
+		FILE *archivoPtr;
+		char buffer[255] = {};
+		if (!(archivoPtr = fopen(".notas", "r+")))
+		{
+
+			puts("\nBlock de notas no encontrado.\n");
+			return 0;
+		}
+		while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
+		{
+			int totalBuffer = strlen(buffer);
+			char *linea = (char *)malloc(totalBuffer);
+			memcpy(linea, buffer, totalBuffer);
+			char *campoId = strtok(buffer, " | ");
+			if (atoi(campoId) == id)
+			{
+				if (linea[7] == '\0')
+				{
+					printf("La entrada n° %lu ya ha sido borrada previamente.\n", id);
+					free(linea);
+					fclose(archivoPtr);
+					return 1;
+				}
+				else
+				{
+
+					printf("Borrando la nota n° %lu.\n", id);
+					// me posiciono cuando comienza la fecha.
+					fseek(archivoPtr, -totalBuffer + 6, SEEK_CUR);
+
+					// ahora 0 seria comienzo de fecha.
+					// tengo que terminar 7 antes, sino me paso del final de la linea
+					for (int x = 0; x < totalBuffer - 7; x++)
+						fputc('\0', archivoPtr); // coloco tantos char vacios
+					fputc('\n', archivoPtr);	 // y al final \n para que pueda contar despues.
+
+					fseek(archivoPtr, 1, SEEK_CUR); // me adelanto 1 mas y caigo a la sig. linea.
+
+					free(linea);
+					fclose(archivoPtr);
+					return 1;
+				}
+			}
+		}
+
+		printf("\e[0;31m id \e[4m%lu\e[0;31m not found.\e[0m\n", id);
+		return 0;
+	}
+}
+
 /* MAIN ***********************************************************************************/
 int main(int argc, char **argv)
 {
@@ -182,6 +246,8 @@ int main(int argc, char **argv)
 		/* Borrar */
 		if (*argv[1] == 'd' && argv[2])
 		{
+			return borrar(argv[2]);
+			/*
 			char *p;
 			long id = strtol(argv[2], &p, 10); // ver el puntero *p !!!!!!
 
@@ -232,6 +298,7 @@ int main(int argc, char **argv)
 				printf("\e[0;31m id \e[4m%lu\e[0;31m not found.\e[0m\n", id);
 				return 0;
 			}
+			*/
 		}
 	};
 
