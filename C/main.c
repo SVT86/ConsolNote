@@ -14,11 +14,12 @@
 int ayuda()
 {
 	const char *items[N_ITEM] = {
-		"w: escribe nota",
-		"r: lee notas",
-		"d: borra nota",
-		"h: ayuda",
-		"v: muestra versión"};
+		"\e[0;32mw\e[m: escribe nota.\n\tw \"NOTA A GUARDAR\"",
+		"\e[0;32mr\e[m: lee notas.\n\tr a : lee todas las notas.\n\tr n : lee la n nota",
+		"\e[0;32md\e[m: borra nota\n\td n : borra la n nota.",
+		"\e[0;32mh\e[m: ayuda",
+		"\e[0;32mv\e[m: muestra versión"
+		};
 
 	for (int i = 0; i < N_ITEM; i++)
 		printf("%s.\n", items[i]);
@@ -121,7 +122,7 @@ int lectura(char *arg2)
 			else
 			{
 				FILE *archivoPtr;
-				archivoPtr = fopen("notas", "r");
+				archivoPtr = fopen(".notas", "r");
 				while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
 				{
 					int totalBuffer = strlen(buffer);
