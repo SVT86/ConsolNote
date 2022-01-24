@@ -11,7 +11,6 @@
 #endif
 
 /* AYUDA ***********************************************************************************/
-
 int ayuda()
 {
 	const char *items[N_ITEM] = {
@@ -28,7 +27,6 @@ int ayuda()
 }
 
 /* ESCRIBIR ********************************************************************************/
-
 int escribir(const char *argumento)
 {
 	registro entrada;
