@@ -189,39 +189,40 @@ int main(int argc, char **argv)
 				puts("Error de parametro id");
 			else
 			{
-				printf("Borrando la nota n° %lu.\n", id);
 				FILE *archivoPtr;
 				char buffer[255] = {};
 				archivoPtr = fopen("notas", "r+");
 				while ((fscanf(archivoPtr, "%[^\n]%*c", buffer)) != EOF)
 				{
-					/* PARECE QUE HABRIA QUE COPIAR TODO Y LUEGO HACER UN ARCHIVO NUEVO SIN LA LINEA DROPEAR*/
-					// VER QUE HACE FSEEK
-					// VER QUE HACE FTELL
 					int totalBuffer = strlen(buffer);
 					char *linea = (char *)malloc(totalBuffer);
 					memcpy(linea, buffer, totalBuffer);
 					char *campoId = strtok(buffer, " | ");
 					if (atoi(campoId) == id)
 					{
-						printf("\n--->%lu\n",ftell(archivoPtr));
-						// ftell me da el marcador del file.
-						// en este caso es el final de la linea coincidente
-						fseek(archivoPtr,-totalBuffer+6,SEEK_CUR);
-						
-						for (int x=0;x<totalBuffer-7;x++)
-							fputc('\0',archivoPtr);
-						fputc('\n',archivoPtr);
+						if (linea[7] == '\0')
+						{
+							printf("La entrada n° %lu ya ha sido borrada previamente.\n", id);
+							free(linea);
+							fclose(archivoPtr);
+							return 1;
+						}
+						else
+						{
 
-						fseek(archivoPtr,1,SEEK_CUR);
+							printf("Borrando la nota n° %lu.\n", id);
+							fseek(archivoPtr, -totalBuffer + 6, SEEK_CUR);
 
-						//fputs("ESTO SERA BORRADO\n", archivoPtr);
+							for (int x = 0; x < totalBuffer - 7; x++)
+								fputc('\0', archivoPtr);
+							fputc('\n', archivoPtr);
 
-						// ahora deberia imprimir un vacio en esa posicion.
-						printf("\n--->%lu\n",ftell(archivoPtr));
-						free(linea);
-						fclose(archivoPtr);
-						return 1;
+							fseek(archivoPtr, 1, SEEK_CUR);
+
+							free(linea);
+							fclose(archivoPtr);
+							return 1;
+						}
 					}
 				}
 			}
