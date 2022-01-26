@@ -3,10 +3,19 @@
 
 #define N_ITEM 5
 
-typedef struct  {
+typedef struct
+{
 	int id;
 	char date[25];
 	char contenido[144];
-} registro ;
+} registro;
+
+int ayuda(void);
+
+int escribir(const char *argumento);
+
+int lectura(char *arg2);
+
+int borrar(char *argumento);
 
 #endif
