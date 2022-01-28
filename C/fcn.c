@@ -63,7 +63,6 @@ int escribir(const char *argumento)
 		return 0;
 	}
 	char buffer[255];
-	char *id;
 
 	entrada.id = contador;
 
@@ -204,4 +203,5 @@ int borrar(char *argumento)
 		printf("\e[0;31m id \e[4m%lu\e[0;31m not found.\e[0m\n", id);
 		return 0;
 	}
+	return 0;
 }
